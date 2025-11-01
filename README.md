@@ -82,6 +82,7 @@ mkdir -p /var/lib/marznode/certs
 in the foren server paste this command
 
 ```
+sudo apt install unzip
 bash <(curl -Ls https://raw.githubusercontent.com/mikeesierrah/ez-node/main/marznode.sh)
 ```
 
