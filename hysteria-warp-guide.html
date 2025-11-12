@@ -413,7 +413,8 @@ docker run --rm -v /opt/marznode/marz/sing-box:/output dawsh/marznode:latest sh 
                 <div class="step">
                     <span class="step-number">3</span>
                     <strong>گرفتن سرتیفیکیت SSL اولیه:</strong>
-                    <pre><code>cat > /tmp/temp-config.json << 'EOF'
+                    <pre><code>
+                        cat > /tmp/temp-config.json << 'EOF'
 {
   "log": {"level": "info"},
   "inbounds": [{
@@ -434,8 +435,17 @@ docker run --rm -v /opt/marznode/marz/sing-box:/output dawsh/marznode:latest sh 
   "outbounds": [{"type": "direct"}]
 }
 EOF
+                            </code></pre>
+<pre><code>
+    nano /opt/marznode/marz/sing-box/marz-box
+          </code></pre>
 
-/opt/marznode/marz/sing-box/marz-box run -c /tmp/temp-config.json</code></pre>
+                    دامنه رو در اینجا تغییر میدیم و بعد از ذخیره این دستور رو میزنیم
+ <pre><code>
+/opt/marznode/marz/sing-box/marz-box run -c /tmp/temp-config.json
+                    
+                    
+                    </code></pre>
                     <div class="warning">
                         <strong>⚠️ مهم:</strong> صبر کن تا سرتیفیکیت دریافت بشه (حدود 10-15 ثانیه)، بعد با Ctrl+C خارج شو
                     </div>
