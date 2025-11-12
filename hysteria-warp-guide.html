@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>راهنمای نصب Hysteria2 + WARP با Sing-box</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            line-height: 1.8;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .header p { font-size: 1.2em; opacity: 0.9; }
+        .content { padding: 40px; }
+        .section {
+            background: #f8f9fa;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            border-right: 5px solid #667eea;
+        }
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .section h3 {
+            color: #764ba2;
+            margin: 25px 0 15px 0;
+            font-size: 1.3em;
+        }
+        .step {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .step-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        code {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            position: relative;
+        }
+        pre code {
+            background: transparent;
+            padding: 0;
+            display: block;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        .copy-btn:hover { background: #764ba2; }
+        .warning {
+            background: #fff3cd;
+            border-right: 5px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        .info {
+            background: #d1ecf1;
+            border-right: 5px solid #17a2b8;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            border-right: 5px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        ul { margin-right: 20px; }
+        li { margin: 10px 0; }
+        .config-box {
+            background: #f8f9fa;
+            border: 2px dashed #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 راهنمای کامل نصب Hysteria2 + WARP</h1>
+            <p>راه‌اندازی Sing-box با Hysteria2 و WARP بر روی Marznode</p>
+        </div>
+        
+        <div class="content">
+            
+            <!-- خلاصه سریع -->
+            <div class="section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+                <h2 style="color: white; border-bottom: 2px solid white;">⚡ خلاصه سریع برای کسانی که عجله دارن</h2>
+                
+                <div class="step" style="background: rgba(255,255,255,0.1); color: white;">
+                    <p style="font-size: 1.1em; margin-bottom: 15px;"><strong>این راهنما چیکار می‌کنه؟</strong></p>
+                    <p>یک Hysteria2 proxy با WARP backend روی سرور مرزنشین می‌سازه که کلاینت‌ها به اون وصل میشن و ترافیکشون از طریق WARP رد میشه.</p>
+                </div>
+
+                <div class="step" style="background: rgba(255,255,255,0.1); color: white;">
+                    <p style="font-size: 1.1em; margin-bottom: 15px;"><strong>معماری:</strong></p>
+                    <pre style="background: rgba(0,0,0,0.3); color: white;"><code>کلاینت → Hysteria2 (port 2020) → Sing-box → WARP SOCKS (port 40000) → اینترنت
+
+مسیر ترافیک:
+1. کاربر با Hysteria2 به سرور وصل میشه (رمزنگاری شده)
+2. Sing-box ترافیک رو می‌گیره و به WARP می‌فرسته
+3. WARP ترافیک رو با IP Cloudflare به اینترنت می‌فرسته</code></pre>
+                </div>
+
+                <div class="step" style="background: rgba(255,255,255,0.1); color: white;">
+                    <p style="font-size: 1.1em; margin-bottom: 15px;"><strong>زمان نصب:</strong> حدود 10-15 دقیقه</p>
+                    <p style="font-size: 1.1em; margin-bottom: 15px;"><strong>سطح دشواری:</strong> متوسط (نیاز به دانش Linux)</p>
+                </div>
+            </div>
+            
+            <!-- پیش‌نیازها -->
+            <div class="section">
+                <h2>📋 پیش‌نیازها</h2>
+                <div class="step">
+                    <ul>
+                        <li>یک سرور مرزنشین (Iran Server) با Ubuntu 22.04 یا بالاتر</li>
+                        <li>یک دامنه (مثل warp-test.trustake.net) که به IP سرور مرزنشین اشاره کنه</li>
+                        <li>دسترسی Root به سرور</li>
+                        <li><strong>پنل Marzban نصب شده و Marznode از طریق <a href="https://github.com/mikeesierrah/ez-node" target="_blank">eazy-node</a> نصب شده باشه</strong></li>
+                    </ul>
+                </div>
+                
+                <div class="info">
+                    <strong>ℹ️ توضیح مهم:</strong> این راهنما فرض می‌کنه که شما از قبل eazy-node نصب کردید و marznode فعاله. مسیر <code>/opt/marznode/marz/</code> از همون طریق ساخته شده. اگه eazy-node نصب نکردی، اول <a href="https://github.com/mikeesierrah/ez-node" target="_blank">ez-node</a> رو نصب کن.
+                </div>
+            </div>
+
+            <!-- جدول پورت‌ها -->
+            <div class="section">
+                <h2>🔌 راهنمای پورت‌ها (مهم!)</h2>
+                
+                <div class="step">
+                    <h3>پورت‌های استفاده شده در این راهنما:</h3>
+                    <table style="width:100%; border-collapse: collapse; margin: 15px 0;">
+                        <thead style="background: #667eea; color: white;">
+                            <tr>
+                                <th style="padding: 12px; text-align: right; border: 1px solid #ddd;">سرویس</th>
+                                <th style="padding: 12px; text-align: right; border: 1px solid #ddd;">پورت</th>
+                                <th style="padding: 12px; text-align: right; border: 1px solid #ddd;">پروتکل</th>
+                                <th style="padding: 12px; text-align: right; border: 1px solid #ddd;">توضیحات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 10px; border: 1px solid #ddd;">WARP SOCKS</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;"><code>40000</code></td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">TCP</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">فقط روی 127.0.0.1 (localhost)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px; border: 1px solid #ddd;">WARP Forward (Socat)</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;"><code>40001</code></td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">TCP</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">روی 172.17.0.1 (Docker bridge)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px; border: 1px solid #ddd;">Hysteria2 Sing-box</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;"><code>2020</code></td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">UDP</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">پورت اصلی برای کلاینت‌ها</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px; border: 1px solid #ddd;">Marznode API</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;"><code>6000</code></td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">TCP</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">ارتباط با پنل Marzban</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="warning">
+                    <h3>⚠️ برای نصب دوم (سرور دوم):</h3>
+                    <p>اگه می‌خوای روی یک سرور دیگه همین کار رو تکرار کنی:</p>
+                    <ul>
+                        <li>پورت <code>2020</code> رو می‌تونی همین نگه داری (چون سرور جداست)</li>
+                        <li>پورت <code>40000</code> WARP همیشه همینه</li>
+                        <li>پورت <code>40001</code> Socat هم همینه</li>
+                        <li>اگه روی یک سرور می‌خوای دو تا WARP داشته باشی، باید پورت‌ها رو تغییر بدی (مثلاً 40002, 40003, 2021)</li>
+                    </ul>
+                </div>
+
+                <div class="info">
+                    <h3>ℹ️ بررسی پورت‌های در حال استفاده:</h3>
+                    <p>قبل از شروع، این دستورات رو بزن تا ببینی چه پورت‌هایی قبلاً استفاده شدن:</p>
+                    <pre><code># بررسی پورت‌های UDP (برای Hysteria)
+netstat -ulnp | grep -E "2020|2021|2022"
+
+# بررسی پورت‌های TCP (برای WARP)
+netstat -tlnp | grep -E "40000|40001|40002"</code></pre>
+                </div>
+            </div>
+
+            <!-- مرحله ۰ -->
+            <div class="section">
+                <h2>مرحله ۰: غیرفعال کردن IPv6 (مهم!)</h2>
+                
+                <div class="warning">
+                    <strong>⚠️ چرا باید IPv6 رو غیرفعال کنیم؟</strong>
+                    <p>IPv6 می‌تونه باعث مشکلات اتصال در WARP و Sing-box بشه. غیرفعال کردن IPv6 اتصال رو پایدارتر می‌کنه.</p>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <strong>ویرایش فایل sysctl.conf:</strong>
+                    <pre><code>sudo nano /etc/sysctl.conf</code></pre>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <strong>اضافه کردن تنظیمات به انتهای فایل:</strong>
+                    <p>دستورات زیر رو در <strong>انتهای فایل</strong> اضافه کن:</p>
+                    <pre><code>net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1</code></pre>
+                    <div class="info">
+                        <strong>نکته:</strong> بعد از اضافه کردن، فایل رو با <code>Ctrl+X</code> سپس <code>Y</code> و <code>Enter</code> ذخیره کن
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <strong>اعمال تنظیمات:</strong>
+                    <pre><code>sudo sysctl -p</code></pre>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <strong>بررسی وضعیت IPv6:</strong>
+                    <pre><code>cat /proc/sys/net/ipv6/conf/all/disable_ipv6</code></pre>
+                    <div class="success">
+                        اگه عدد <code>1</code> رو برگردوند، یعنی IPv6 غیرفعال شده ✓
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">5</span>
+                    <strong>تست اتصال (اختیاری):</strong>
+                    <pre><code># این دستور نباید جواب بده (timeout)
+ping6 google.com
+
+# این دستور باید جواب بده (فقط IPv4)
+ping -c 3 google.com</code></pre>
+                </div>
+            </div>
+
+            <!-- مرحله ۱ -->
+            <div class="section">
+                <h2>مرحله ۱: نصب WARP</h2>
+                
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <strong>اضافه کردن repository WARP:</strong>
+                    <pre><code>curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | gpg --dearmor -o /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com noble main" | tee /etc/apt/sources.list.d/cloudflare-client.list</code></pre>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <strong>نصب WARP:</strong>
+                    <pre><code>apt update && apt install cloudflare-warp -y</code></pre>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <strong>تنظیم WARP به حالت Proxy:</strong>
+                    <pre><code>warp-cli registration new
+warp-cli mode proxy
+warp-cli proxy port 40000
+warp-cli connect</code></pre>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <strong>بررسی وضعیت WARP:</strong>
+                    <pre><code>warp-cli status</code></pre>
+                    <div class="success">
+                        باید پیام <code>Status update: Connected</code> رو ببینی
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">5</span>
+                    <strong>تست WARP:</strong>
+                    <pre><code>curl -x socks5://127.0.0.1:40000 https://www.cloudflare.com/cdn-cgi/trace</code></pre>
+                    <div class="info">
+                        باید <code>warp=on</code> در نتیجه ببینی
+                    </div>
+                </div>
+            </div>
+
+            <!-- مرحله ۲ -->
+            <div class="section">
+                <h2>مرحله ۲: راه‌اندازی Socat (برای دسترسی Docker به WARP)</h2>
+                
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <strong>نصب Socat:</strong>
+                    <pre><code>apt install socat -y</code></pre>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <strong>ساخت Systemd Service:</strong>
+                    <pre><code>cat > /etc/systemd/system/warp-proxy-forward.service << 'EOF'
+[Unit]
+Description=Forward WARP SOCKS to Docker accessible IP
+After=warp-svc.service
+Wants=warp-svc.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/socat TCP-LISTEN:40001,bind=172.17.0.1,fork,reuseaddr TCP:127.0.0.1:40000
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+EOF</code></pre>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <strong>فعال‌سازی Service:</strong>
+                    <pre><code>systemctl daemon-reload
+systemctl enable warp-proxy-forward
+systemctl start warp-proxy-forward
+systemctl status warp-proxy-forward</code></pre>
+                </div>
+            </div>
+
+            <!-- مرحله ۳ -->
+            <div class="section">
+                <h2>مرحله ۳: نصب و تنظیم Sing-box</h2>
+                
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <strong>دانلود Sing-box (با V2Ray API):</strong>
+                    <pre><code>cd /opt/marznode/marz
+mkdir -p sing-box certs
+docker run --rm -v /opt/marznode/marz/sing-box:/output dawsh/marznode:latest sh -c "cp /usr/local/bin/sing-box /output/marz-box && chmod +x /output/marz-box"</code></pre>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <strong>بررسی نسخه:</strong>
+                    <pre><code>/opt/marznode/marz/sing-box/marz-box version</code></pre>
+                    <div class="info">
+                        باید <code>with_v2ray_api</code> در Tags باشه
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <strong>گرفتن سرتیفیکیت SSL اولیه:</strong>
+                    <pre><code>cat > /tmp/temp-config.json << 'EOF'
+{
+  "log": {"level": "info"},
+  "inbounds": [{
+    "type": "hysteria2",
+    "listen": "::",
+    "listen_port": 2020,
+    "users": [{"password": "temp"}],
+    "tls": {
+      "enabled": true,
+      "server_name": "warp-test.trustake.net",
+      "acme": {
+        "domain": "warp-test.trustake.net",
+        "email": "your-email@gmail.com",
+        "provider": "letsencrypt"
+      }
+    }
+  }],
+  "outbounds": [{"type": "direct"}]
+}
+EOF
+
+/opt/marznode/marz/sing-box/marz-box run -c /tmp/temp-config.json</code></pre>
+                    <div class="warning">
+                        <strong>⚠️ مهم:</strong> صبر کن تا سرتیفیکیت دریافت بشه (حدود 10-15 ثانیه)، بعد با Ctrl+C خارج شو
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <strong>کپی سرتیفیکیت‌ها:</strong>
+                    <pre><code>cp /root/.local/share/certmagic/certificates/acme-v02.api.letsencrypt.org-directory/warp-test.trustake.net/warp-test.trustake.net.crt /opt/marznode/marz/certs/
+cp /root/.local/share/certmagic/certificates/acme-v02.api.letsencrypt.org-directory/warp-test.trustake.net/warp-test.trustake.net.key /opt/marznode/marz/certs/
+chmod 644 /opt/marznode/marz/certs/warp-test.trustake.net.crt
+chmod 600 /opt/marznode/marz/certs/warp-test.trustake.net.key</code></pre>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">5</span>
+                    <strong>ساخت کانفیگ نهایی Sing-box:</strong>
+                    <pre><code>cat > /opt/marznode/marz/sing-box/config.json << 'EOF'
+{
+  "log": {
+    "level": "info",
+    "timestamp": true
+  },
+  "dns": {
+    "servers": [
+      {
+        "tag": "cloudflare",
+        "address": "https://1.1.1.1/dns-query"
+      }
+    ],
+    "rules": [],
+    "strategy": "prefer_ipv4"
+  },
+  "inbounds": [
+    {
+      "type": "hysteria2",
+      "tag": "hysteria-in",
+      "listen": "::",
+      "listen_port": 2020,
+      "users": [
+        {
+          "password": "your_secure_password"
+        }
+      ],
+      "obfs": {
+        "type": "salamander",
+        "password": "BbU9kd44uwer2eZFEWDFXVGGGO2TLaUase"
+      },
+      "tls": {
+        "enabled": true,
+        "server_name": "warp-test.trustake.net",
+        "key_path": "/opt/marznode/marz/certs/warp-test.trustake.net.key",
+        "certificate_path": "/opt/marznode/marz/certs/warp-test.trustake.net.crt"
+      },
+      "masquerade": "https://google.com",
+      "up_mbps": 10000,
+      "down_mbps": 10000,
+      "ignore_client_bandwidth": false
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "socks",
+      "tag": "warp-proxy",
+      "server": "172.17.0.1",
+      "server_port": 40001,
+      "version": "5"
+    },
+    {
+      "type": "direct",
+      "tag": "direct"
+    },
+    {
+      "type": "dns",
+      "tag": "dns-out"
+    },
+    {
+      "type": "block",
+      "tag": "block"
+    }
+  ],
+  "route": {
+    "rules": [
+      {
+        "protocol": "dns",
+        "outbound": "dns-out"
+      }
+    ],
+    "final": "warp-proxy",
+    "auto_detect_interface": true
+  }
+}
+EOF</code></pre>
+                    <div class="warning">
+                        <strong>🔧 قبل از اجرا این موارد رو تغییر بده:</strong>
+                        <ul>
+                            <li><code>warp-test.trustake.net</code> → دامنه خودت</li>
+                            <li><code>your_secure_password</code> → پسورد قوی</li>
+                            <li><code>BbU9kd44uwer2eZFEWDFXVGGGO2TLaUase</code> → پسورد obfs (اختیاری)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- مرحله ۴ -->
+            <div class="section">
+                <h2>مرحله ۴: فعال‌سازی Sing-box در Marznode</h2>
+                
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <strong>ویرایش فایل .env:</strong>
+                    <pre><code>nano /opt/marznode/marz/.env</code></pre>
+                    <div class="info">
+                        مطمئن شو این خطوط موجود باشن:
+                        <pre><code>SING_BOX_ENABLED=True
+SING_BOX_EXECUTABLE_PATH=/opt/marznode/marz/sing-box/marz-box
+SING_BOX_CONFIG_PATH=/opt/marznode/marz/sing-box/config.json</code></pre>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <strong>Restart کردن Marznode:</strong>
+                    <pre><code>cd /opt/marznode/marz
+docker compose restart
+docker compose logs -f</code></pre>
+                    <div class="success">
+                        باید پیام <code>sing-box 1.11.3 started</code> رو ببینی
+                    </div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <strong>بررسی پورت:</strong>
+                    <pre><code>netstat -ulnp | grep 2020</code></pre>
+                </div>
+            </div>
+
+            <!-- مرحله ۵ -->
+            <div class="section">
+                <h2>مرحله ۵: کانفیگ کلاینت</h2>
+                
+                <div class="config-box">
+                    <h3>🔗 لینک کانفیگ (برای v2rayN/Nekoray):</h3>
+                    <pre><code>hysteria2://your_secure_password@warp-test.trustake.net:2020/?sni=warp-test.trustake.net&obfs=salamander&obfs-password=BbU9kd44uwer2eZFEWDFXVGGGO2TLaUase#Hysteria2-WARP</code></pre>
+                </div>
+
+                <div class="config-box">
+                    <h3>📄 کانفیگ JSON:</h3>
+                    <pre><code>{
+  "server": "warp-test.trustake.net:2020",
+  "auth": "your_secure_password",
+  "tls": {
+    "sni": "warp-test.trustake.net"
+  },
+  "obfs": {
+    "type": "salamander",
+    "salamander": {
+      "password": "BbU9kd44uwer2eZFEWDFXVGGGO2TLaUase"
+    }
+  }
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- تست -->
+            <div class="section">
+                <h2>✅ تست و بررسی</h2>
+                
+                <div class="step">
+                    <strong>بررسی سرویس‌ها:</strong>
+                    <pre><code>systemctl status warp-svc
+systemctl status warp-proxy-forward
+docker compose ps</code></pre>
+                </div>
+
+                <div class="step">
+                    <strong>بررسی لاگ‌ها:</strong>
+                    <pre><code>docker compose logs -f --tail 50
+journalctl -u warp-svc -f</code></pre>
+                </div>
+
+                <div class="step">
+                    <strong>بررسی پنل Marzban:</strong>
+                    <ul>
+                        <li>برو به پنل Marzban → Nodes</li>
+                        <li>Sing-Box باید وضعیت "Up" داشته باشه</li>
+                        <li>می‌تونی از طریق پنل کاربر بسازی</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- عیب‌یابی -->
+            <div class="section">
+                <h2>🔧 عیب‌یابی</h2>
+                
+                <div class="step">
+                    <h3>مشکل: Sing-box Down هست</h3>
+                    <pre><code>docker compose logs | grep sing
+/opt/marznode/marz/sing-box/marz-box check -c /opt/marznode/marz/sing-box/config.json</code></pre>
+                </div>
+
+                <div class="step">
+                    <h3>مشکل: WARP متصل نمیشه</h3>
+                    <pre><code>warp-cli disconnect
+warp-cli connect
+warp-cli status</code></pre>
+                </div>
+
+                <div class="step">
+                    <h3>مشکل: سرتیفیکیت منقضی شد</h3>
+                    <div class="info">
+                        سرتیفیکیت Let's Encrypt هر 90 روز منقضی میشه. برای تمدید:
+                        <pre><code>rm -rf /root/.local/share/certmagic/
+# بعد مرحله 3.3 رو دوباره اجرا کن</code></pre>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <h3>مشکل: اتصال قطع و وصل میشه یا کند هست</h3>
+                    <div class="warning">
+                        <p>احتمالاً IPv6 هنوز فعاله. بررسی کن:</p>
+                        <pre><code># بررسی وضعیت IPv6
+cat /proc/sys/net/ipv6/conf/all/disable_ipv6
+
+# اگه 0 برگردوند، یعنی هنوز فعاله
+# مرحله 0 رو دوباره اجرا کن و سرور رو reboot کن:
+sudo reboot</code></pre>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <h3>مشکل: Docker به WARP متصل نمیشه</h3>
+                    <pre><code># بررسی Socat
+systemctl status warp-proxy-forward
+
+# بررسی پورت forward
+netstat -tlnp | grep 40001
+
+# اگه چیزی نشون نداد، socat رو restart کن:
+systemctl restart warp-proxy-forward</code></pre>
+                </div>
+
+                <div class="step">
+                    <h3>مشکل: فعال کردن دوباره IPv6 (اگه نیاز داری)</h3>
+                    <div class="info">
+                        <p>اگه به هر دلیلی خواستی IPv6 رو دوباره فعال کنی:</p>
+                        <pre><code># حذف تنظیمات از sysctl.conf
+sudo nano /etc/sysctl.conf
+# خطوط مربوط به IPv6 رو پاک کن و ذخیره کن
+
+# اعمال تغییرات
+sudo sysctl -p
+
+# یا بصورت موقت فعال کردن:
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=0
+sudo sysctl -w net.ipv6.conf.default.disable_ipv6=0</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- نکات امنیتی -->
+            <div class="section">
+                <h2>🔒 نکات امنیتی</h2>
+                
+                <ul>
+                    <li>پسوردهای قوی استفاده کن (حداقل 16 کاراکتر)</li>
+                    <li>فایروال رو فعال کن و فقط پورت‌های لازم رو باز کن</li>
+                    <li>به صورت منظم سیستم رو آپدیت کن</li>
+                    <li>از SSH با کلید استفاده کن</li>
+                    <li>لاگ‌ها رو به صورت دوره‌ای بررسی کن</li>
+                </ul>
+            </div>
+
+            <!-- سناریوهای مختلف -->
+            <div class="section">
+                <h2>🎯 سناریوهای مختلف نصب</h2>
+                
+                <div class="step">
+                    <h3>سناریو ۱: نصب روی سرور اول (مثل راهنما)</h3>
+                    <div class="info">
+                        <ul>
+                            <li>پورت Hysteria: <code>2020</code></li>
+                            <li>پورت WARP: <code>40000</code> → <code>40001</code></li>
+                            <li>دامنه: <code>warp-test.trustake.net</code></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <h3>سناریو ۲: نصب روی سرور دوم (با همان پورت‌ها)</h3>
+                    <div class="info">
+                        <p>چون سرور جداست، پورت‌ها conflict نمی‌کنن:</p>
+                        <ul>
+                            <li>پورت Hysteria: <code>2020</code> (همان)</li>
+                            <li>پورت WARP: <code>40000</code> → <code>40001</code> (همان)</li>
+                            <li>دامنه: <code>warp-test2.trustake.net</code> (متفاوت)</li>
+                        </ul>
+                        <p><strong>مراحل:</strong> دقیقاً همین راهنما رو دنبال کن، فقط دامنه رو عوض کن</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <h3>سناریو ۳: نصب دومین WARP روی همان سرور</h3>
+                    <div class="warning">
+                        <p><strong>⚠️ توجه:</strong> این سناریو پیچیده‌تره و نیاز به تغییرات زیاد داره!</p>
+                        <p><strong>تغییرات لازم:</strong></p>
+                        <ul>
+                            <li>نمی‌شه دو تا WARP روی یک سرور داشت (محدودیت Cloudflare)</li>
+                            <li>اگه می‌خوای دو تا Hysteria با WARP داشته باشی، باید:
+                                <ul>
+                                    <li>یک WARP نصب کنی</li>
+                                    <li>دو تا Sing-box با پورت‌های متفاوت (مثلاً 2020 و 2021)</li>
+                                    <li>هر دو به همان WARP (40000) متصل بشن</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        
+                        <p><strong>مثال برای Sing-box دوم:</strong></p>
+                        <pre><code># ساخت فولدر دوم
+mkdir -p /opt/marznode/marz/sing-box2
+
+# کپی marz-box
+cp /opt/marznode/marz/sing-box/marz-box /opt/marznode/marz/sing-box2/
+
+# کانفیگ دوم با پورت 2021
+nano /opt/marznode/marz/sing-box2/config.json
+# فقط listen_port رو به 2021 تغییر بده
+
+# ساخت systemd service دوم
+cat > /etc/systemd/system/singbox-warp2.service << 'EOFSERVICE'
+[Unit]
+Description=Sing-box 2 with WARP
+After=network.target warp-svc.service singbox-warp.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/marznode/marz/sing-box2
+ExecStart=/opt/marznode/marz/sing-box2/marz-box run -c /opt/marznode/marz/sing-box2/config.json
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOFSERVICE
+
+systemctl daemon-reload
+systemctl enable singbox-warp2
+systemctl start singbox-warp2</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- چک‌لیست نهایی -->
+            <div class="section">
+                <h2>✅ چک‌لیست نهایی قبل از شروع</h2>
+                
+                <div class="step">
+                    <h3>قبل از اجرای دستورات:</h3>
+                    <ul style="list-style-type: none;">
+                        <li>☐ eazy-node نصب شده؟ (<code>ls /opt/marznode/marz/</code>)</li>
+                        <li>☐ دامنه به IP سرور اشاره می‌کنه؟ (<code>ping your-domain.com</code>)</li>
+                        <li>☐ پورت‌های 2020, 40000, 40001 خالی هستن؟ (دستورات بالا)</li>
+                        <li>☐ پنل Marzban فعال و در دسترس هست؟</li>
+                        <li>☐ IPv6 رو غیرفعال کردی؟ (مرحله ۰)</li>
+                        <li>☐ پسوردها و دامنه رو تغییر دادی؟</li>
+                        <li>☐ ایمیل رو در کانفیگ عوض کردی؟</li>
+                    </ul>
+                </div>
+
+                <div class="success">
+                    <strong>🎉 اگه همه موارد چک شدن، آماده‌ای! از مرحله ۰ شروع کن.</strong>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Add copy buttons
+        document.querySelectorAll('pre').forEach(pre => {
+            const btn = document.createElement('button');
+            btn.className = 'copy-btn';
+            btn.textContent = 'کپی';
+            btn.onclick = () => {
+                const code = pre.querySelector('code').textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    btn.textContent = 'کپی شد ✓';
+                    setTimeout(() => btn.textContent = 'کپی', 2000);
+                });
+            };
+            pre.style.position = 'relative';
+            pre.appendChild(btn);
+        });
+    </script>
+</body>
+</html>
